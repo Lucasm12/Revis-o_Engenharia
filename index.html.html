@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Revisão: Engenharia de Requisitos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF1FF; --bg-dot:#D7DDFB; --surface:#FFFFFF; --ink:#1E1B4B; --ink-soft:#4A4780;
+  --violet:#5B4BDB; --violet-soft:#E6E2FF; --sun:#FFC940; --sun-soft:#FFF4D1;
+  --ok:#128A63; --ok-soft:#DDF6EC; --bad:#D63B42; --bad-soft:#FDE4E5; --mid:#C98A00;
+  --line:#CBD1F5; --shadow:0 6px 0 #C9CEF2; --btn-ink:#fff; --btn-edge:#3B2FA8;
+  --display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#15143A; --bg-dot:#23225A; --surface:#1F1E4F; --ink:#F1F0FF; --ink-soft:#B9B6E8;
+    --violet:#9D90FF; --violet-soft:#2E2B6E; --sun:#FFD166; --sun-soft:#3A3320;
+    --ok:#4FD6A5; --ok-soft:#123B33; --bad:#FF7A80; --bad-soft:#44202A; --mid:#FFD166;
+    --line:#39377A; --shadow:0 6px 0 #0E0D2A; --btn-ink:#15143A; --btn-edge:#5A4FC0;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15143A; --bg-dot:#23225A; --surface:#1F1E4F; --ink:#F1F0FF; --ink-soft:#B9B6E8;
+  --violet:#9D90FF; --violet-soft:#2E2B6E; --sun:#FFD166; --sun-soft:#3A3320;
+  --ok:#4FD6A5; --ok-soft:#123B33; --bad:#FF7A80; --bad-soft:#44202A; --mid:#FFD166;
+  --line:#39377A; --shadow:0 6px 0 #0E0D2A; --btn-ink:#15143A; --btn-edge:#5A4FC0;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+  font-family:var(--body); font-size:1.0625rem; line-height:1.55;
+  background-image:radial-gradient(var(--bg-dot) 1.5px, transparent 1.5px);
+  background-size:22px 22px;
+}
+.wrap{max-width:780px; margin:0 auto; padding:1.25rem 1rem 3rem}
+button{font:inherit; color:inherit; cursor:pointer}
+:focus-visible{outline:3px solid var(--violet); outline-offset:3px; border-radius:10px}
+
+.top{display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem}
+.brand{font-family:var(--display); font-weight:800; font-size:1.2rem; line-height:1.1}
+.brand small{display:block; font-weight:500; font-size:.9rem; color:var(--ink-soft)}
+.score{display:flex; gap:.5rem; align-items:center}
+.pill{font-family:var(--display); font-weight:700; background:var(--surface); border:2px solid var(--line);
+  border-radius:999px; padding:.15rem .8rem; font-size:1rem; white-space:nowrap}
+.pill.streak{background:var(--sun-soft); border-color:var(--sun)}
+
+/* Trilha: um segmento por questão, funciona de 10 a 40 */
+.trail{display:flex; gap:4px; margin:.25rem 0 1.25rem}
+.seg{flex:1; height:12px; border-radius:6px; background:var(--surface); border:2px solid var(--line); transition:background .25s, transform .25s}
+.seg.ok{background:var(--ok); border-color:var(--ok)}
+.seg.bad{background:var(--bad); border-color:var(--bad)}
+.seg.now{border-color:var(--violet); background:var(--violet-soft); transform:scaleY(1.5)}
+
+.card{background:var(--surface); border:2px solid var(--line); border-radius:22px; box-shadow:var(--shadow);
+  padding:1.5rem 1.5rem 1.25rem}
+@media (max-width:520px){ .card{padding:1.1rem 1rem 1rem; border-radius:18px} }
+.meta{display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; margin-bottom:.9rem}
+.topic{background:var(--violet-soft); color:var(--violet); font-weight:700; font-size:.85rem; padding:.2rem .7rem; border-radius:8px}
+.count{font-size:.9rem; color:var(--ink-soft)}
+.scenario{background:var(--sun-soft); border-radius:6px 16px 16px 16px; padding:1rem 1.1rem; margin:0 0 1rem; font-size:1rem; border-left:5px solid var(--sun)}
+.scenario b{font-family:var(--display); display:block; font-size:.95rem; margin-bottom:.15rem}
+h2.q{font-family:var(--display); font-weight:700; font-size:1.35rem; line-height:1.25; margin:0 0 1rem}
+
+.opts{display:grid; gap:.6rem; margin:0; padding:0; list-style:none}
+.opt{display:flex; gap:.8rem; align-items:flex-start; width:100%; text-align:left;
+  background:var(--surface); border:2px solid var(--line); border-radius:14px; padding:.75rem .9rem;
+  transition:border-color .15s, background .15s, transform .1s}
+.opt:hover:not(:disabled){border-color:var(--violet); background:var(--violet-soft)}
+.opt:active:not(:disabled){transform:translateY(2px)}
+.opt:disabled{cursor:default}
+.letter{flex:none; width:32px; height:32px; border-radius:10px; display:grid; place-items:center;
+  font-family:var(--display); font-weight:800; background:var(--violet-soft); color:var(--violet)}
+.opt .txt{padding-top:.2rem}
+.opt.dim{opacity:.45}
+.opt.right{border-color:var(--ok); background:var(--ok-soft)}
+.opt.right .letter{background:var(--ok); color:#fff}
+.opt.wrong{border-color:var(--bad); background:var(--bad-soft)}
+.opt.wrong .letter{background:var(--bad); color:#fff}
+.opt.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.opt.pop{animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.03)}}
+
+.fb{margin-top:1.1rem; border-radius:16px; padding:1rem 1.1rem; display:none}
+.fb.show{display:block; animation:rise .3s ease-out}
+@keyframes rise{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+.fb.ok{background:var(--ok-soft); border:2px solid var(--ok)}
+.fb.bad{background:var(--bad-soft); border:2px solid var(--bad)}
+.fb h3{font-family:var(--display); font-size:1.35rem; margin:0 0 .4rem; line-height:1.2}
+.fb.ok h3{color:var(--ok)} .fb.bad h3{color:var(--bad)}
+.compare{display:grid; gap:.5rem; margin:.4rem 0 .8rem}
+.compare div{background:var(--surface); border-radius:10px; padding:.55rem .75rem; font-size:.97rem}
+.compare .w{border-left:5px solid var(--bad)} .compare .r{border-left:5px solid var(--ok)}
+.compare strong{display:block; font-size:.85rem}
+.tip{background:var(--surface); border-radius:12px; padding:.75rem .9rem; font-size:.98rem}
+.tip b.h{font-family:var(--display); font-size:1rem; display:block; margin-bottom:.2rem}
+.tip ul{margin:.3rem 0 0; padding-left:1.2rem} .tip li{margin:.2rem 0}
+
+.actions{display:flex; justify-content:space-between; align-items:center; gap:.75rem; margin-top:1.1rem; flex-wrap:wrap}
+.hint{font-size:.85rem; color:var(--ink-soft)}
+.btn{font-family:var(--display); font-weight:700; font-size:1.1rem; border:none; border-radius:14px;
+  padding:.6rem 1.4rem; background:var(--violet); color:var(--btn-ink); box-shadow:0 4px 0 var(--btn-edge); transition:transform .1s, box-shadow .1s}
+.btn:active{transform:translateY(3px); box-shadow:0 1px 0 var(--btn-edge)}
+.btn[hidden]{display:none}
+.btn.ghost{background:var(--surface); color:var(--ink); border:2px solid var(--line); box-shadow:0 4px 0 var(--line)}
+.link{background:none; border:none; color:var(--ink-soft); text-decoration:underline; font-size:.9rem; padding:.2rem}
+
+/* Início */
+.hero{text-align:center; padding:2rem 1.5rem}
+.hero .emoji{font-size:3.5rem; line-height:1}
+.hero h1{font-family:var(--display); font-weight:800; font-size:clamp(2rem,6vw,3rem); line-height:1.05; margin:.5rem 0 .6rem}
+.hero p{max-width:34rem; margin:0 auto 1rem; color:var(--ink-soft)}
+.rules{display:flex; flex-wrap:wrap; justify-content:center; gap:.5rem; margin:1rem 0 1.25rem; padding:0; list-style:none}
+.rules li{background:var(--violet-soft); border-radius:10px; padding:.35rem .8rem; font-size:.93rem}
+.pick-title{font-family:var(--display); font-weight:700; font-size:1.25rem; margin:.5rem 0 .75rem}
+.sizes{display:grid; grid-template-columns:repeat(4,1fr); gap:.75rem; max-width:560px; margin:0 auto}
+@media (max-width:520px){ .sizes{grid-template-columns:repeat(2,1fr)} }
+.size{background:var(--surface); border:3px solid var(--line); border-radius:18px; padding:.9rem .5rem .8rem;
+  box-shadow:0 5px 0 var(--line); transition:transform .12s, border-color .12s, box-shadow .12s}
+.size:hover{border-color:var(--violet); transform:translateY(-3px); box-shadow:0 8px 0 var(--violet-soft)}
+.size:active{transform:translateY(3px); box-shadow:0 1px 0 var(--line)}
+.size .n{display:block; font-family:var(--display); font-weight:800; font-size:2.4rem; line-height:1; color:var(--violet)}
+.size .l{display:block; font-weight:700; font-size:.95rem}
+.size .t{display:block; font-size:.82rem; color:var(--ink-soft)}
+.note{font-size:.88rem; color:var(--ink-soft); margin-top:1rem}
+
+/* Resultado */
+.result-head{text-align:center}
+.big-score{font-family:var(--display); font-weight:800; font-size:4.5rem; line-height:1; color:var(--violet)}
+.big-score span{font-size:2rem; color:var(--ink-soft)}
+.stars{font-size:2rem; letter-spacing:.2rem; margin:.4rem 0}
+.sec{margin-top:1.75rem}
+.sec h3{font-family:var(--display); font-size:1.35rem; margin:0 0 .6rem; line-height:1.2}
+.bars{display:grid; gap:.7rem}
+.bar-row .lbl{display:flex; justify-content:space-between; gap:1rem; font-size:.95rem; margin-bottom:.2rem}
+.bar-row .lbl b{font-weight:700}
+.track{height:14px; background:var(--bg); border-radius:7px; overflow:hidden; border:2px solid var(--line)}
+.fill{height:100%; border-radius:5px; width:0; transition:width .8s ease-out}
+.fill.hi{background:var(--ok)} .fill.md{background:var(--sun)} .fill.lo{background:var(--bad)}
+.improve{display:grid; gap:.7rem}
+.imp{background:var(--sun-soft); border-left:5px solid var(--sun); border-radius:6px 14px 14px 6px; padding:.8rem 1rem}
+.imp.good{background:var(--ok-soft); border-left-color:var(--ok)}
+.imp b.h{font-family:var(--display); font-size:1.05rem; display:block}
+.imp ul{margin:.3rem 0 0; padding-left:1.2rem} .imp li{margin:.15rem 0; font-size:.97rem}
+.qlist{display:grid; gap:.45rem}
+.qitem{background:var(--bg); border-radius:12px; border:2px solid transparent}
+.qitem summary{display:flex; gap:.6rem; align-items:flex-start; padding:.55rem .75rem; cursor:pointer; list-style:none; font-size:.95rem}
+.qitem summary::-webkit-details-marker{display:none}
+.qitem[open]{border-color:var(--line)}
+.qitem .dot{flex:none; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; color:#fff; font-weight:700; font-size:.8rem; margin-top:.05rem}
+.dot.ok{background:var(--ok)} .dot.bad{background:var(--bad)}
+.qitem .qt small{display:block; color:var(--ink-soft); font-size:.82rem}
+.qitem .body{padding:0 .75rem .75rem 2.6rem; font-size:.95rem; display:grid; gap:.4rem}
+.qitem .body div{background:var(--surface); border-radius:10px; padding:.5rem .7rem}
+.qitem .body .w{border-left:5px solid var(--bad)} .qitem .body .r{border-left:5px solid var(--ok)}
+.qitem .body strong{display:block; font-size:.82rem}
+.empty{color:var(--ink-soft); font-size:.95rem; margin:0}
+.end-actions{display:flex; gap:.75rem; justify-content:center; flex-wrap:wrap; margin-top:1.75rem}
+
+#confetti{position:fixed; inset:0; pointer-events:none; z-index:50}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){ *{animation:none!important; transition:none!important} }
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Engenharia de Requisitos<small>Revisão para a 1ª avaliação</small></div>
+    <div class="score" id="scoreBox" hidden>
+      <span class="pill" title="Acertos">⭐ <span id="scoreNum">0</span></span>
+      <span class="pill streak" title="Acertos seguidos">🔥 <span id="streakNum">0</span></span>
+    </div>
+  </header>
+  <nav class="trail" id="trail" aria-label="Progresso" hidden></nav>
+  <main id="app"></main>
+  <div class="sr" aria-live="polite" id="live"></div>
+</div>
+
+<script>
+/* ============ TEMAS ============ */
+const TOPICS = {
+  processo:{ name:"Processo holístico de ER",
+    study:["Revise as atividades da ER: viabilidade, elicitação, análise, especificação, validação e gestão.",
+           "Diferencie requisito funcional de não funcional, e requisito de usuário de requisito de sistema.",
+           "Lembre que a gestão de requisitos e o controle de mudanças acompanham o projeto inteiro.",
+           "Pratique identificar todos os stakeholders, não só quem paga o projeto."]},
+  elicitacao:{ name:"Elicitação e priorização",
+    study:["Monte uma tabela com cada técnica (entrevista, questionário, JAD, observação, protótipo, brainstorming) e quando usar cada uma.",
+           "Procure as pistas no cenário: muitas pessoas longe = questionário; conflito entre áreas = JAD; conhecimento tácito = observação.",
+           "Revise MoSCoW, Kano e a técnica dos 100 pontos para priorização."]},
+  especificacao:{ name:"Especificação e documentação",
+    study:["Treine reconhecer formatos: User Story, Gherkin, caso de uso e diagramas UML.",
+           "Revise as qualidades de um bom requisito: não ambíguo, completo, consistente, verificável e rastreável.",
+           "Pratique reescrever requisitos vagos com métrica, meta e forma de medição.",
+           "Estude a matriz de rastreabilidade e o uso dela na análise de impacto."]},
+  qualidade:{ name:"Atributos e psicologia da qualidade",
+    study:["Decore as 8 dimensões de Garvin e crie um exemplo do dia a dia para cada uma.",
+           "Separe o que é objetivo (conformidade, desempenho) do que é subjetivo (estética, qualidade percebida).",
+           "Revise as cinco abordagens da qualidade de Garvin e as características da ISO/IEC 25010."]},
+  maturidade:{ name:"Maturidade e melhoria de processos",
+    study:["Revise a ordem e o objetivo de cada etapa do DMAIC e do PDCA.",
+           "Compare os níveis do CMMI (1 a 5) com os do MPS.BR (G a A).",
+           "Relembre as ferramentas da qualidade: Ishikawa, Pareto e 5 Porquês, e em que etapa cada uma entra."]}
+};
+
+/* ============ QUESTÕES (8 por tema) ============ */
+const QUESTIONS = [
+/* ---------- PROCESSO HOLÍSTICO ---------- */
+{ t:"processo", exam:true,
+  s:"Em um projeto de sistema de folha de pagamento, a equipe considerou o documento de requisitos “congelado” logo após a assinatura inicial do cliente. Seis meses depois, uma mudança na legislação trabalhista tornou vários requisitos obsoletos, mas a equipe recusou-se a atualizá-los, alegando que “requisitos já aprovados não podem ser alterados”. O sistema foi entregue em desacordo com a legislação vigente.",
+  q:"Sob a perspectiva do processo holístico de Engenharia de Requisitos, qual foi o erro conceitual da equipe?",
+  o:["Nenhum erro: requisitos aprovados formalmente não devem mesmo ser alterados, independentemente do contexto.",
+     "A gestão de requisitos, incluindo o controle de mudanças, é contínua. Tratar o documento como “congelado” ignora que necessidades de negócio (inclusive legais) evoluem ao longo do projeto.",
+     "O problema foi exclusivamente de especificação formal, não de gestão de requisitos.",
+     "Mudanças legais não são consideradas requisitos e, portanto, não precisam ser geridas pela ER.",
+     "O processo de ER deve terminar antes da assinatura do documento, tornando a questão irrelevante para essa disciplina."],
+  c:1, tip:["Requisitos mudam, e isso é normal",[
+    "A ER não acaba na assinatura: a <b>gestão de requisitos</b> acompanha o projeto do início ao fim.",
+    "Aprovar um documento cria uma <b>baseline</b> (versão de referência), não um “congelamento” eterno.",
+    "Mudança se trata com <b>controle de mudanças</b>: solicitação, análise de impacto e aprovação."]]},
+{ t:"processo", exam:true,
+  s:"Uma equipe conduziu a elicitação de requisitos de um novo sistema interno conversando apenas com o diretor que patrocinou o projeto. Ao lançar o sistema, os funcionários que usariam a ferramenta no dia a dia rejeitaram a solução, pois ela não refletia a forma real como o trabalho era executado.",
+  q:"Essa situação exemplifica uma falha em qual atividade do processo holístico de ER?",
+  o:["Especificação formal dos requisitos não funcionais.",
+     "Análise e identificação incompleta de stakeholders: a equipe ouviu só o patrocinador e ignorou os usuários finais.",
+     "Priorização incorreta de requisitos já levantados corretamente.",
+     "Excesso de validação de requisitos com os usuários finais.",
+     "Uso inadequado de diagramas UML na documentação."],
+  c:1, tip:["Quem são os stakeholders?",[
+    "Stakeholder é qualquer pessoa ou grupo <b>afetado</b> pelo sistema ou que o <b>influencia</b>.",
+    "Quem paga nem sempre é quem usa. O usuário final conhece o trabalho <b>real</b>.",
+    "Ferramenta útil: matriz <b>poder × interesse</b> para decidir como envolver cada grupo."]]},
+{ t:"processo",
+  s:"A equipe escreveu a especificação completa de um aplicativo de agendamento e passou direto para o desenvolvimento, sem que o cliente revisasse o documento. Na primeira demonstração, o cliente disse que várias regras tinham sido entendidas de forma errada.",
+  q:"Qual atividade da ER foi negligenciada?",
+  o:["Validação de requisitos, que confirma com os stakeholders se os requisitos representam o que eles realmente precisam.",
+     "Estudo de viabilidade técnica e econômica do projeto.",
+     "Rastreabilidade entre código e casos de teste.",
+     "Priorização pelo método MoSCoW.",
+     "Teste de carga e desempenho do servidor."],
+  c:0, tip:["Validar antes de construir",[
+    "A <b>validação</b> revisa os requisitos com quem vai usar o sistema, antes de programar.",
+    "Técnicas comuns: revisões, inspeções, protótipos e casos de teste escritos a partir dos requisitos.",
+    "Erro de requisito descoberto cedo custa muito menos do que depois da entrega."]]},
+{ t:"processo",
+  s:"Em um sistema de vendas, foram levantados dois requisitos: (I) “O sistema deve gerar um relatório mensal de vendas por vendedor.” (II) “O relatório deve ser gerado em no máximo 3 segundos.”",
+  q:"Como os requisitos I e II são classificados, respectivamente?",
+  o:["Ambos são requisitos funcionais, pois falam do relatório.",
+     "I é não funcional e II é funcional.",
+     "I é funcional (o que o sistema faz) e II é não funcional (uma restrição de qualidade, no caso desempenho).",
+     "Ambos são requisitos de domínio.",
+     "I é requisito de sistema e II é regra de negócio."],
+  c:2, tip:["O quê × como bem",[
+    "<b>Funcional</b>: descreve uma função, um serviço, <i>o que</i> o sistema faz.",
+    "<b>Não funcional</b>: descreve uma qualidade ou restrição, <i>quão bem</i> ele faz: desempenho, segurança, usabilidade.",
+    "Dica: números de tempo, disponibilidade ou capacidade quase sempre indicam RNF."]]},
+{ t:"processo",
+  s:"Uma empresa iniciou um projeto de monitoramento por sensores. Após quatro meses de trabalho, descobriu que o orçamento não cobria o hardware necessário e que a tecnologia escolhida não funcionava na região rural onde seria instalada.",
+  q:"Qual atividade inicial da ER poderia ter evitado esse prejuízo?",
+  o:["Elaboração do diagrama de classes.",
+     "Estudo de viabilidade, que avalia se o projeto é técnica, econômica e operacionalmente viável antes de começar.",
+     "Escrita das histórias de usuário do backlog.",
+     "Criação da matriz de rastreabilidade.",
+     "Controle de mudanças durante a manutenção."],
+  c:1, tip:["Primeiro: vale a pena?",[
+    "O <b>estudo de viabilidade</b> responde se o sistema pode e deve ser construído.",
+    "Olha viabilidade <b>técnica</b>, <b>econômica</b>, <b>operacional</b> e de <b>prazo</b>.",
+    "É barato e rápido, e evita investir meses em algo que não se sustenta."]]},
+{ t:"processo",
+  s:"O diretor comercial escreveu: “Os clientes devem poder acompanhar seus pedidos.” O analista detalhou: “Ao acessar a tela Meus Pedidos, o sistema deve exibir o status de cada pedido, atualizado a cada 5 minutos a partir da API da transportadora.”",
+  q:"Os dois textos são exemplos, respectivamente, de:",
+  o:["Requisito de sistema e requisito de usuário.",
+     "Regra de negócio e caso de teste.",
+     "Requisito não funcional e requisito funcional.",
+     "Requisito de usuário (alto nível, linguagem do cliente) e requisito de sistema (detalhado, para quem vai desenvolver).",
+     "User story e critério de aceite em Gherkin."],
+  c:3, tip:["Dois níveis de detalhe",[
+    "<b>Requisito de usuário</b>: linguagem natural, alto nível, para clientes e gestores.",
+    "<b>Requisito de sistema</b>: descrição detalhada do comportamento, base para projeto e desenvolvimento.",
+    "Um requisito de usuário costuma virar <b>vários</b> requisitos de sistema."]]},
+{ t:"processo",
+  s:"Um sistema para farmácias hospitalares precisa seguir as normas da ANVISA sobre controle de medicamentos, como registrar lote e validade de cada item dispensado. Essas exigências não vieram de um usuário específico, e sim das regras do próprio setor.",
+  q:"Requisitos que surgem das características e normas da área de aplicação são chamados de:",
+  o:["Requisitos de domínio.",
+     "Requisitos emergentes de interface.",
+     "Requisitos de hardware.",
+     "Requisitos opcionais (Could have).",
+     "Requisitos de usabilidade."],
+  c:0, tip:["O setor também fala",[
+    "<b>Requisitos de domínio</b> vêm das regras, normas e conceitos do negócio em que o sistema atua.",
+    "Podem ser funcionais ou não funcionais.",
+    "Ignorá-los pode tornar o sistema inutilizável ou ilegal, mesmo que o usuário não tenha pedido."]]},
+{ t:"processo",
+  s:"Durante a revisão de um projeto, a professora perguntou à turma: “Uma coisa é saber se estamos construindo o produto certo; outra é saber se estamos construindo o produto corretamente.”",
+  q:"A pergunta “estamos construindo o produto certo?” corresponde a:",
+  o:["Verificação.",
+     "Validação, que confere se o sistema atende às necessidades reais dos stakeholders.",
+     "Rastreabilidade.",
+     "Refatoração.",
+     "Estimativa de esforço."],
+  c:1, tip:["V&V de Boehm",[
+    "<b>Validação</b>: estamos construindo o produto <b>certo</b>? Atende à necessidade real?",
+    "<b>Verificação</b>: estamos construindo o produto <b>corretamente</b>? Segue a especificação?",
+    "Macete: vaLIDação olha para o cLIente; verificação olha para o documento."]]},
+
+/* ---------- ELICITAÇÃO E PRIORIZAÇÃO ---------- */
+{ t:"elicitacao", exam:true,
+  s:"Os departamentos de Vendas e Logística têm visões conflitantes sobre o novo sistema de pedidos. A equipe reuniu representantes de ambos em uma única sessão presencial, intensiva e estruturada, conduzida por um facilitador neutro, para chegar a um consenso em poucas horas.",
+  q:"Essa técnica de elicitação é conhecida como:",
+  o:["Questionário assíncrono.",
+     "Análise de documentos legados.",
+     "JAD (Joint Application Development) / Workshop de requisitos.",
+     "Observação etnográfica não participante.",
+     "Prototipagem descartável (throwaway prototyping)."],
+  c:2, tip:["As pistas do JAD",[
+    "<b>Todos juntos</b>, <b>facilitador neutro</b>, sessão <b>estruturada</b> e foco em <b>consenso</b>.",
+    "Ideal quando há <b>conflito entre áreas</b> e pouco tempo.",
+    "Questionário é à distância; etnografia é observar; protótipo é mostrar algo para reagir."]]},
+{ t:"elicitacao", exam:true,
+  s:"Uma empresa precisa adequar seu sistema à LGPD até uma data-limite improrrogável. A lista inclui itens obrigatórios por lei, itens importantes mas negociáveis, itens desejáveis e itens que definitivamente não entrarão nesta entrega.",
+  q:"Qual técnica de priorização é mais adequada para essas quatro categorias, dado o prazo rígido?",
+  o:["Método MoSCoW (Must have, Should have, Could have, Won’t have).",
+     "Diagrama de Ishikawa (espinha de peixe).",
+     "Ciclo PDCA.",
+     "Diagrama de Sequência UML.",
+     "Técnica DMAIC do Six Sigma."],
+  c:0, tip:["MoSCoW em uma frase cada",[
+    "<b>Must</b>: obrigatório. <b>Should</b>: importante, negociável.",
+    "<b>Could</b>: desejável, se sobrar tempo. <b>Won’t</b>: fora <i>desta</i> entrega.",
+    "Quatro categorias + prazo fixo = MoSCoW."]]},
+{ t:"elicitacao",
+  s:"Os operadores de uma central de atendimento não conseguem explicar direito como fazem seu trabalho: muitos passos são automáticos e “vêm com a prática”. O analista decidiu passar três dias ao lado deles, acompanhando a rotina real.",
+  q:"Qual técnica de elicitação o analista está usando?",
+  o:["Questionário fechado.",
+     "Brainstorming.",
+     "Análise de documentos.",
+     "Observação (etnografia), útil para capturar conhecimento tácito que as pessoas não sabem verbalizar.",
+     "Workshop JAD."],
+  c:3, tip:["Ver em vez de perguntar",[
+    "<b>Observação/etnografia</b>: o analista acompanha o trabalho no ambiente real.",
+    "Revela o <b>conhecimento tácito</b>, atalhos e problemas que ninguém lembra de contar.",
+    "Desvantagem: consome tempo e as pessoas podem mudar o comportamento ao se sentirem observadas."]]},
+{ t:"elicitacao",
+  s:"Uma rede varejista quer saber a opinião de 3.000 funcionários espalhados por lojas em todo o Brasil sobre o novo sistema de ponto. O prazo é curto, o orçamento é baixo e a gestão quer dados que possam ser contados em gráficos.",
+  q:"Qual técnica de elicitação é a mais indicada?",
+  o:["Entrevistas individuais com cada funcionário.",
+     "Questionário, que alcança muitas pessoas distantes com baixo custo e gera dados quantitativos.",
+     "Observação etnográfica em todas as lojas.",
+     "Workshop JAD presencial com os 3.000 funcionários.",
+     "Prototipagem evolutiva."],
+  c:1, tip:["Muita gente, pouco tempo",[
+    "<b>Questionário</b>: escala, baixo custo e resultados fáceis de tabular.",
+    "Limite: não permite aprofundar, e perguntas mal escritas geram respostas ruins.",
+    "Combine com algumas entrevistas para entender o “porquê” das respostas."]]},
+{ t:"elicitacao",
+  s:"Os usuários de um novo aplicativo de delivery diziam: “Só vou saber se está bom quando eu ver.” A equipe então desenhou telas simples no Figma, mostrou aos usuários e ajustou os requisitos de acordo com as reações deles.",
+  q:"Qual técnica foi usada?",
+  o:["Prototipagem, que torna os requisitos visíveis para que os usuários possam reagir e dar feedback.",
+     "Análise de pontos de função.",
+     "Diagrama de Pareto.",
+     "Entrevista fechada.",
+     "Matriz de rastreabilidade."],
+  c:0, tip:["Mostrar para descobrir",[
+    "<b>Protótipo</b> ajuda quando o usuário não consegue imaginar o sistema só pela descrição.",
+    "<b>Descartável</b>: serve só para aprender, depois é jogado fora. <b>Evolutivo</b>: vai sendo melhorado até virar o produto.",
+    "Cuidado: o cliente pode achar que o protótipo já é o sistema pronto."]]},
+{ t:"elicitacao",
+  s:"A analista preparou um roteiro com perguntas para entrevistar o gerente financeiro, mas deixou espaço para fazer novas perguntas conforme surgiam assuntos interessantes na conversa.",
+  q:"Esse formato de entrevista é chamado de:",
+  o:["Entrevista fechada (estruturada).",
+     "Questionário online.",
+     "Entrevista aberta, sem nenhum roteiro.",
+     "Grupo focal.",
+     "Entrevista semiestruturada, que combina um roteiro base com liberdade para explorar novos pontos."],
+  c:4, tip:["Três tipos de entrevista",[
+    "<b>Fechada</b>: perguntas fixas, fácil de comparar respostas.",
+    "<b>Aberta</b>: conversa livre, explora bastante, mas pode perder o foco.",
+    "<b>Semiestruturada</b>: o meio-termo, o formato mais usado na prática."]]},
+{ t:"elicitacao",
+  s:"Em um app bancário, a equipe classificou funcionalidades assim: fazer login com segurança (o cliente nem elogia, mas reclama muito se faltar), transferências mais rápidas (quanto melhor, mais satisfeito) e um resumo mensal com gráficos animados (ninguém pediu, mas encanta quem vê).",
+  q:"Qual modelo de priorização foi aplicado?",
+  o:["MoSCoW.",
+     "DMAIC.",
+     "Modelo de Kano, que separa requisitos básicos (obrigatórios), de desempenho e atrativos (encantadores).",
+     "CMMI.",
+     "Diagrama de Ishikawa."],
+  c:2, tip:["Kano e a satisfação",[
+    "<b>Básico</b>: a ausência gera insatisfação, a presença não gera elogio.",
+    "<b>Desempenho</b>: quanto mais, melhor, de forma proporcional.",
+    "<b>Atrativo</b>: não é esperado, mas encanta. Com o tempo vira básico."]]},
+{ t:"elicitacao",
+  s:"Cinco gerentes precisavam priorizar 12 requisitos. Cada um recebeu 100 pontos para distribuir entre os requisitos como quisesse. No fim, os pontos foram somados e os requisitos ordenados pelo total.",
+  q:"Essa técnica de priorização é conhecida como:",
+  o:["Técnica dos 100 pontos (votação cumulativa).",
+     "Planning Poker.",
+     "Diagrama de Pareto.",
+     "Análise SWOT.",
+     "Modelo de Kano."],
+  c:0, tip:["Pontos obrigam a escolher",[
+    "Na <b>técnica dos 100 pontos</b>, cada stakeholder “gasta” um orçamento fixo.",
+    "Como os pontos são limitados, ninguém consegue dizer que tudo é prioridade máxima.",
+    "Planning Poker serve para <b>estimar esforço</b>, não para priorizar valor."]]},
+
+/* ---------- ESPECIFICAÇÃO E DOCUMENTAÇÃO ---------- */
+{ t:"especificacao", exam:true,
+  s:"Uma equipe ágil escreve: “Como cliente, eu quero receber um e-mail de confirmação após finalizar uma compra, para ter certeza de que meu pedido foi registrado.” E complementa: “Dado que o cliente finalizou a compra, Quando o pagamento for aprovado, Então um e-mail de confirmação deve ser enviado em até 1 minuto.”",
+  q:"Essas duas formas de documentação correspondem, respectivamente, a:",
+  o:["Diagrama de Classes e Diagrama de Casos de Uso.",
+     "História de Usuário (User Story) e Critério de Aceite no formato Gherkin (Given/When/Then, usado em BDD).",
+     "Especificação formal em lógica de predicados e pseudocódigo.",
+     "Caso de Uso completo e Diagrama de Atividades.",
+     "Requisito não funcional e Matriz de Rastreabilidade."],
+  c:1, tip:["Reconheça pelo formato",[
+    "User Story: <b>Como</b> [papel], <b>eu quero</b> [ação], <b>para</b> [benefício].",
+    "Gherkin: <b>Dado</b> (contexto), <b>Quando</b> (evento), <b>Então</b> (resultado).",
+    "Boa história segue o <b>INVEST</b>: independente, negociável, valiosa, estimável, pequena e testável."]]},
+{ t:"especificacao", exam:true,
+  s:"Durante a manutenção de um sistema, uma regra de negócio precisou ser alterada. Antes de implementar, a equipe consultou um documento que relaciona cada requisito às telas, aos casos de teste e aos módulos de código, identificando rapidamente tudo o que seria impactado.",
+  q:"Esse documento/prática é conhecido como:",
+  o:["Matriz de Rastreabilidade de Requisitos.",
+     "Modelo de Kano.",
+     "Backlog priorizado.",
+     "Diagrama de Casos de Uso.",
+     "Termo de Abertura do Projeto (Project Charter)."],
+  c:0, tip:["Rastrear é ligar os pontos",[
+    "A matriz liga cada requisito à sua <b>origem</b> e a tudo que ele <b>gera</b>: telas, código e testes.",
+    "Para trás: de onde veio. Para frente: onde foi implementado.",
+    "Principal uso: <b>análise de impacto</b> antes de uma mudança."]]},
+{ t:"especificacao", exam:true,
+  s:"Em um marketplace que conecta produtores rurais a consumidores (que usam um app móvel), a disponibilidade é um requisito não funcional importante. O cliente escreveu: “o sistema deve estar sempre disponível”.",
+  q:"Qual reescrita transforma esse requisito vago em um requisito preciso e verificável?",
+  o:["O sistema deve ficar disponível na maior parte do tempo, com o mínimo possível de interrupções.",
+     "O sistema deve ter disponibilidade mínima de 99,5% ao mês, medida por monitoramento externo a cada 1 minuto, excluindo manutenções avisadas com 48h de antecedência.",
+     "O sistema deve estar 100% disponível, 24 horas por dia, sem nenhuma exceção.",
+     "O sistema deve ser rápido e confiável para produtores e consumidores.",
+     "O servidor deve usar a tecnologia de nuvem mais moderna do mercado."],
+  c:1, tip:["Receita de um RNF mensurável",[
+    "<b>Métrica</b> (disponibilidade), <b>meta</b> (99,5%), <b>período</b> (ao mês).",
+    "<b>Como medir</b> (monitoramento) e <b>exceções</b> (manutenção avisada). 99,5% ao mês ≈ 3h36min fora do ar.",
+    "100% é irrealista; “nuvem moderna” é solução técnica, não requisito."]]},
+{ t:"especificacao",
+  s:"Um documento traz: “Nome: Realizar Pagamento. Ator: Cliente. Pré-condição: carrinho com itens. Fluxo principal: 1. Cliente escolhe forma de pagamento; 2. Sistema valida os dados; 3. Sistema confirma o pedido. Fluxo alternativo 2a: cartão recusado, sistema pede outro cartão.”",
+  q:"Que tipo de documentação é essa?",
+  o:["Diagrama de sequência.",
+     "User Story no formato INVEST.",
+     "Especificação (descrição textual) de caso de uso, com ator, pré-condição, fluxo principal e fluxos alternativos.",
+     "Matriz de rastreabilidade.",
+     "Diagrama de classes."],
+  c:2, tip:["Anatomia de um caso de uso",[
+    "Elementos típicos: <b>nome</b>, <b>ator</b>, <b>pré e pós-condições</b>, <b>fluxo principal</b> e <b>fluxos alternativos/exceção</b>.",
+    "O diagrama de casos de uso é só o “mapa”; o detalhe fica na descrição textual.",
+    "Fluxos alternativos são onde moram as regras que mais geram bugs."]]},
+{ t:"especificacao",
+  s:"No diagrama de casos de uso de um caixa eletrônico, toda vez que o cliente executa “Realizar Saque”, o sistema obrigatoriamente executa também “Autenticar Cliente”. Já “Imprimir Comprovante” só acontece se o cliente pedir.",
+  q:"Qual relacionamento liga “Realizar Saque” a “Autenticar Cliente”?",
+  o:["«extend», porque o comportamento é opcional.",
+     "Generalização entre atores.",
+     "Associação simples entre ator e caso de uso.",
+     "Dependência de pacote.",
+     "«include», porque o comportamento é sempre executado como parte do caso de uso base."],
+  c:4, tip:["Include × Extend",[
+    "<b>«include»</b>: sempre acontece. O caso base <i>inclui</i> o outro obrigatoriamente.",
+    "<b>«extend»</b>: acontece só em certas condições, como o comprovante opcional.",
+    "Macete: include = incluído sempre; extend = extra, às vezes."]]},
+{ t:"especificacao",
+  s:"No documento de requisitos de uma biblioteca digital aparecem: RF03 “Todo acesso ao sistema exige login e senha.” e RF11 “Visitantes podem consultar o catálogo sem se identificar.”",
+  q:"Qual característica de qualidade da especificação está sendo violada?",
+  o:["Rastreabilidade.",
+     "Consistência, pois os dois requisitos se contradizem.",
+     "Modificabilidade.",
+     "Priorização.",
+     "Portabilidade."],
+  c:1, tip:["Qualidades de um bom requisito",[
+    "Correto, <b>não ambíguo</b>, completo, <b>consistente</b>, verificável, priorizado, modificável e rastreável.",
+    "<b>Inconsistência</b> = dois requisitos que não podem ser verdade ao mesmo tempo.",
+    "Revisões e inspeções do documento servem justamente para pegar isso cedo."]]},
+{ t:"especificacao",
+  s:"Uma equipe quer padronizar a estrutura do seu Documento de Especificação de Requisitos de Software (SRS), com seções como introdução, descrição geral, requisitos específicos e apêndices.",
+  q:"Qual norma é a referência clássica para esse tipo de documento?",
+  o:["ISO 9001, que certifica sistemas de gestão da qualidade de qualquer empresa.",
+     "PMBOK, que é o guia de gerenciamento de projetos.",
+     "IEEE 830 (atualizada pela ISO/IEC/IEEE 29148), que orienta a estrutura e as qualidades de uma SRS.",
+     "ITIL, que trata de gerenciamento de serviços de TI.",
+     "Scrum Guide, que define papéis e eventos do Scrum."],
+  c:2, tip:["O “molde” da SRS",[
+    "<b>IEEE 830</b> é a referência histórica; a <b>ISO/IEC/IEEE 29148</b> é a versão atual.",
+    "Ela define a estrutura do documento e as qualidades esperadas de cada requisito.",
+    "ISO 9001, PMBOK e ITIL são importantes, mas tratam de outros assuntos."]]},
+{ t:"especificacao",
+  s:"A analista precisa modelar o ciclo de vida de um pedido: ele começa como Aberto, passa para Pago, depois Enviado e Entregue. A partir de Aberto ou Pago, pode ir para Cancelado.",
+  q:"Qual diagrama UML é o mais adequado para isso?",
+  o:["Diagrama de máquina de estados, que mostra os estados de um objeto e as transições entre eles.",
+     "Diagrama de classes.",
+     "Diagrama de casos de uso.",
+     "Diagrama de implantação.",
+     "Diagrama de componentes."],
+  c:0, tip:["Qual diagrama usar?",[
+    "<b>Estados</b>: como <i>um objeto</i> muda de situação ao longo do tempo.",
+    "<b>Atividades</b>: o fluxo de passos de um processo.",
+    "<b>Sequência</b>: a troca de mensagens entre objetos, em ordem temporal."]]},
+
+/* ---------- QUALIDADE ---------- */
+{ t:"qualidade", exam:true,
+  s:"Uma fábrica garante que 100% dos seus eletrodomésticos atendem rigorosamente às especificações técnicas (medidas, voltagem, materiais). Ainda assim, os consumidores preferem marcas concorrentes, percebidas como “mais confiáveis”, mesmo com especificações semelhantes.",
+  q:"Essa situação ilustra a diferença entre quais duas dimensões da qualidade, segundo Garvin?",
+  o:["Durabilidade (vida útil) e Atendimento (suporte técnico).",
+     "Desempenho (performance) e Características (features).",
+     "Conformidade (aderência às especificações) e Qualidade Percebida (reputação e percepção subjetiva do cliente).",
+     "Estética (aparência) e Confiabilidade (probabilidade de falha).",
+     "Não há diferença relevante entre essas dimensões no modelo de Garvin."],
+  c:2, tip:["As 8 dimensões de Garvin",[
+    "Desempenho, Características, Confiabilidade, <b>Conformidade</b>, Durabilidade, Atendimento, Estética e <b>Qualidade Percebida</b>.",
+    "Conformidade é <b>objetiva</b>; qualidade percebida é <b>subjetiva</b> (marca, reputação).",
+    "“Mais confiáveis” entre aspas fala de <i>percepção</i>, não de taxa de falhas medida."]]},
+{ t:"qualidade", exam:true,
+  s:"Uma empresa de software alcançou o nível F do MPS.BR, com processos bem documentados e seguidos rigorosamente. Mesmo assim, os clientes dizem que o software “funciona conforme contratado”, mas “parece antiquado” e é “difícil de usar” comparado aos concorrentes.",
+  q:"Qual explicação, com base nas dimensões de Garvin, é a mais adequada?",
+  o:["Isso é impossível: o nível F do MPS.BR garante automaticamente a satisfação do cliente.",
+     "Processos maduros garantem principalmente Conformidade, mas não asseguram Estética e Qualidade Percebida. O software pode funcionar como contratado e ainda parecer antiquado.",
+     "O problema é só de Durabilidade: o software vai parar de funcionar em pouco tempo.",
+     "As dimensões de Garvin só se aplicam a produtos físicos, nunca a software.",
+     "A baixa satisfação prova que a empresa não segue seus processos, contrariando o nível F."],
+  c:1, tip:["Processo maduro ≠ cliente encantado",[
+    "Maturidade (MPS.BR, CMMI) mede a <b>capacidade do processo</b>, não o gosto do cliente.",
+    "“Funciona conforme contratado” = <b>Conformidade</b>. “Parece antiquado” = <b>Estética</b>.",
+    "No DMAIC, comece pelo <b>Define</b>, ouvindo a voz do cliente."]]},
+{ t:"qualidade",
+  s:"Uma marca de notebooks divulga que, em testes com 10 mil aparelhos, apenas 0,5% apresentaram algum defeito durante o primeiro ano de uso.",
+  q:"Essa informação está ligada principalmente a qual dimensão de Garvin?",
+  o:["Estética.",
+     "Durabilidade, que mede quanto tempo o produto dura até ser substituído.",
+     "Características.",
+     "Confiabilidade, que é a probabilidade de o produto falhar dentro de um período.",
+     "Atendimento."],
+  c:3, tip:["Confiabilidade × Durabilidade",[
+    "<b>Confiabilidade</b>: chance de falhar em um período. “Quase nunca dá problema.”",
+    "<b>Durabilidade</b>: vida útil total. “Dura muitos anos.”",
+    "Um produto pode ser durável e pouco confiável, com vários pequenos defeitos ao longo de muitos anos."]]},
+{ t:"qualidade",
+  s:"Dois aplicativos de banco oferecem exatamente as mesmas funções. Em uma pesquisa, os usuários preferiram o segundo porque ele “tem cores bonitas, ícones agradáveis e uma aparência mais moderna”.",
+  q:"Qual dimensão de Garvin explica essa preferência?",
+  o:["Estética, que envolve aparência, sensação e impressão sensorial do produto.",
+     "Conformidade.",
+     "Desempenho.",
+     "Durabilidade.",
+     "Atendimento."],
+  c:0, tip:["Estética é gosto",[
+    "<b>Estética</b>: como o produto parece, soa ou se sente. É subjetiva e pessoal.",
+    "Em software, aparece na interface visual, na tipografia e nas animações.",
+    "Mesmas funções + preferência pela aparência = estética."]]},
+{ t:"qualidade",
+  s:"Uma operadora de internet é elogiada porque, quando há problema, o suporte atende em poucos minutos, é educado e resolve o caso na primeira ligação.",
+  q:"Esse ponto forte corresponde a qual dimensão de Garvin?",
+  o:["Características.",
+     "Qualidade percebida.",
+     "Atendimento (serviceability): rapidez, cortesia e competência no suporte e no reparo.",
+     "Confiabilidade.",
+     "Conformidade."],
+  c:2, tip:["Atendimento conta",[
+    "<b>Atendimento</b>: facilidade, rapidez e cortesia do suporte e da manutenção.",
+    "Um bom atendimento pode compensar parte das falhas de um produto.",
+    "Em software: canais de suporte, tempo de resposta e facilidade de corrigir problemas."]]},
+{ t:"qualidade",
+  s:"Dois celulares têm o mesmo processador e a mesma bateria. Um deles, porém, vem com NFC para pagamento por aproximação, sensor infravermelho e rádio FM, funções extras que o outro não tem.",
+  q:"Essa diferença se refere a qual dimensão de Garvin?",
+  o:["Desempenho.",
+     "Características (features): funções secundárias que complementam o funcionamento básico.",
+     "Durabilidade.",
+     "Conformidade.",
+     "Estética."],
+  c:1, tip:["Desempenho × Características",[
+    "<b>Desempenho</b>: as funções principais e o quão bem elas funcionam (velocidade, bateria).",
+    "<b>Características</b>: os “extras” que complementam o produto.",
+    "Mesmo processador e bateria = mesmo desempenho. A diferença está nos extras."]]},
+{ t:"qualidade",
+  s:"Após a implantação de um novo sistema de RH, funcionários recém-contratados conseguiram registrar férias sozinhos em menos de 10 minutos, sem treinamento e sem cometer erros.",
+  q:"Segundo a ISO/IEC 25010, esse resultado evidencia qual característica de qualidade do produto?",
+  o:["Portabilidade.",
+     "Manutenibilidade.",
+     "Compatibilidade.",
+     "Eficiência de desempenho.",
+     "Usabilidade, que inclui facilidade de aprender, operar e evitar erros."],
+  c:4, tip:["ISO/IEC 25010 em uma linha",[
+    "Oito características: adequação funcional, eficiência de desempenho, compatibilidade, <b>usabilidade</b>, confiabilidade, segurança, manutenibilidade e portabilidade.",
+    "<b>Usabilidade</b> inclui aprendizagem, operabilidade, proteção contra erro e acessibilidade.",
+    "“Aprender sozinho rápido e sem erro” é o retrato da usabilidade."]]},
+{ t:"qualidade",
+  s:"Um gerente afirma: “Para mim, qualidade é adequação ao uso. Um produto tem qualidade quando atende às necessidades e preferências de quem vai usá-lo.”",
+  q:"Entre as cinco abordagens da qualidade descritas por Garvin, essa visão corresponde à:",
+  o:["Abordagem transcendental, em que qualidade é algo que se reconhece mas não se define.",
+     "Abordagem baseada no usuário.",
+     "Abordagem baseada na produção, que foca em seguir a especificação.",
+     "Abordagem baseada no valor, que relaciona qualidade e preço.",
+     "Abordagem baseada no produto, que mede atributos do próprio produto."],
+  c:1, tip:["As 5 abordagens de Garvin",[
+    "<b>Transcendental</b>: “sei que é bom quando vejo”.",
+    "<b>Produto</b>: mais atributos = mais qualidade. <b>Produção</b>: conformidade com a especificação.",
+    "<b>Usuário</b>: adequação ao uso (Juran). <b>Valor</b>: qualidade a um preço aceitável."]]},
+
+/* ---------- MATURIDADE E MELHORIA ---------- */
+{ t:"maturidade", exam:true,
+  s:"Uma equipe de melhoria contínua mediu com precisão a taxa de defeitos de uma linha de produção, mas, em vez de investigar as causas-raiz, partiu direto para uma solução que “pareceu óbvia”. A solução não resolveu o problema, pois a causa real era outra.",
+  q:"Qual etapa do ciclo DMAIC (Six Sigma) foi indevidamente pulada?",
+  o:["Define (Definir).",
+     "Measure (Medir), que na verdade foi realizada corretamente.",
+     "Analyze (Analisar): a identificação das causas-raiz, que deveria anteceder a implementação de soluções.",
+     "Control (Controlar).",
+     "Nenhuma etapa foi pulada; o DMAIC não exige análise de causas-raiz."],
+  c:2, tip:["DMAIC na ordem",[
+    "<b>D</b>efinir, <b>M</b>edir, <b>A</b>nalisar, <b>I</b>mplementar (Improve), <b>C</b>ontrolar.",
+    "A equipe foi de <b>M</b> direto para <b>I</b>, pulando o <b>A</b>.",
+    "Ferramentas do Analisar: Ishikawa, 5 Porquês e Pareto."]]},
+{ t:"maturidade",
+  s:"Em uma software house, cada projeto é tocado de um jeito. As entregas só dão certo quando dois programadores muito experientes “viram a noite”. Quando eles saem de férias, prazos e qualidade despencam.",
+  q:"Segundo o CMMI, essa organização está em qual nível de maturidade?",
+  o:["Nível 1, Inicial: processos imprevisíveis e sucesso dependente de esforço individual (“heróis”).",
+     "Nível 2, Gerenciado.",
+     "Nível 3, Definido.",
+     "Nível 4, Quantitativamente gerenciado.",
+     "Nível 5, Em otimização."],
+  c:0, tip:["A escada do CMMI",[
+    "<b>1 Inicial</b>: caótico, depende de heróis. <b>2 Gerenciado</b>: projetos planejados e acompanhados.",
+    "<b>3 Definido</b>: processo padrão da organização. <b>4 Quantitativamente gerenciado</b>: controle estatístico.",
+    "<b>5 Em otimização</b>: melhoria contínua e inovação."]]},
+{ t:"maturidade",
+  s:"Uma pequena empresa de software brasileira decidiu iniciar sua jornada de melhoria usando o MPS.BR e quer saber por onde começar e qual é o nível mais alto do modelo.",
+  q:"Qual afirmação sobre os níveis do MPS.BR está correta?",
+  o:["Os níveis vão de 1 a 5, como no CMMI, começando pelo 1.",
+     "O primeiro nível é o A e o mais alto é o G.",
+     "O modelo tem apenas três níveis: básico, intermediário e avançado.",
+     "Os níveis vão de G (Parcialmente gerenciado, o primeiro) até A (Em otimização, o mais alto).",
+     "Não há níveis; a empresa recebe apenas “aprovada” ou “reprovada”."],
+  c:3, tip:["MPS.BR de trás para frente",[
+    "Sete níveis: <b>G</b> Parcialmente gerenciado, <b>F</b> Gerenciado, <b>E</b> Parcialmente definido, <b>D</b> Largamente definido, <b>C</b> Definido, <b>B</b> Gerenciado quantitativamente, <b>A</b> Em otimização.",
+    "Começa no <b>G</b> e sobe até o <b>A</b>.",
+    "O nível F, da questão sobre satisfação, é o segundo degrau."]]},
+{ t:"maturidade",
+  s:"O dono de uma empresa com 15 desenvolvedores está em dúvida entre adotar o CMMI ou o MPS.BR para melhorar seus processos.",
+  q:"Qual é uma vantagem do MPS.BR para esse tipo de empresa?",
+  o:["O MPS.BR dispensa qualquer documentação de processos.",
+     "O MPS.BR é obrigatório por lei para empresas brasileiras de software.",
+     "Criado pela SOFTEX para a realidade brasileira, ele tem mais níveis (sete), com degraus menores e custo de avaliação mais acessível para pequenas e médias empresas.",
+     "O MPS.BR garante certificação automática no CMMI nível 5.",
+     "O MPS.BR só avalia a qualidade do código-fonte, não os processos."],
+  c:2, tip:["Por que MPS.BR?",[
+    "Criado pela <b>SOFTEX</b> em 2003, compatível com o CMMI e com normas ISO.",
+    "<b>Sete níveis</b> permitem evoluir em passos menores e ver resultado mais cedo.",
+    "Custo de implantação e avaliação menor, pensado para PMEs brasileiras."]]},
+{ t:"maturidade",
+  s:"Uma escola planejou reduzir a evasão, executou as ações planejadas (tutoria e reforço), mas nunca comparou os resultados obtidos com a meta. No semestre seguinte, repetiu tudo igual, sem saber se tinha funcionado.",
+  q:"Qual etapa do ciclo PDCA foi negligenciada?",
+  o:["Plan (Planejar).",
+     "Check (Verificar), que compara os resultados com as metas.",
+     "Do (Executar).",
+     "Act (Agir), que padroniza ou corrige com base na verificação.",
+     "Nenhuma, pois o PDCA só tem três etapas."],
+  c:1, tip:["PDCA gira sem parar",[
+    "<b>P</b>lanejar, <b>D</b>o (executar), <b>C</b>heck (verificar), <b>A</b>ct (agir).",
+    "Sem o <b>Check</b>, não há como saber se a ação funcionou, e o Act fica às cegas.",
+    "DMAIC é mais detalhado e orientado a dados; PDCA é mais simples e cíclico."]]},
+{ t:"maturidade",
+  s:"Após um projeto Six Sigma, o tempo de atendimento de um call center caiu de 12 para 5 minutos. Três meses depois, sem acompanhamento, indicadores ou padronização, a equipe voltou aos velhos hábitos e o tempo subiu para 11 minutos.",
+  q:"Qual etapa do DMAIC falhou?",
+  o:["Define (Definir).",
+     "Measure (Medir).",
+     "Analyze (Analisar).",
+     "Improve (Implementar).",
+     "Control (Controlar), que sustenta os ganhos com monitoramento e padronização."],
+  c:4, tip:["Sem controle, tudo volta",[
+    "<b>Control</b> garante que a melhoria se mantenha: indicadores, padrões, treinamentos, planos de reação.",
+    "A melhoria funcionou (Improve ok), mas não foi sustentada.",
+    "Ferramentas: cartas de controle, procedimentos padrão, auditorias."]]},
+{ t:"maturidade",
+  s:"Em um estudo sobre qualidade, a professora explicou que um processo “Seis Sigma” é aquele extremamente capaz, com variação tão pequena que os defeitos se tornam raríssimos.",
+  q:"Qual é a meta clássica de desempenho associada ao nível Seis Sigma?",
+  o:["3,4 defeitos por milhão de oportunidades.",
+     "6 defeitos a cada 100 produtos.",
+     "Zero defeitos garantidos em qualquer situação.",
+     "1 defeito por mil oportunidades.",
+     "60% de produtos sem defeito."],
+  c:0, tip:["O número mágico",[
+    "Seis Sigma = <b>3,4 DPMO</b> (defeitos por milhão de oportunidades), ou 99,99966% sem defeito.",
+    "O foco é <b>reduzir a variação</b> do processo com base em dados.",
+    "O método de melhoria de processos existentes é o <b>DMAIC</b>."]]},
+{ t:"maturidade",
+  s:"Na etapa de análise, uma equipe listou todas as causas de devolução de produtos e montou um gráfico de barras em ordem decrescente de frequência, com uma linha de percentual acumulado. Descobriu que 3 das 15 causas respondiam por cerca de 80% das devoluções.",
+  q:"Qual ferramenta da qualidade foi usada?",
+  o:["Diagrama de Ishikawa.",
+     "Fluxograma.",
+     "Diagrama de Pareto, baseado no princípio 80/20: poucas causas geram a maioria dos efeitos.",
+     "Carta de controle.",
+     "Matriz MoSCoW."],
+  c:2, tip:["Ataque o que mais pesa",[
+    "<b>Pareto</b>: barras em ordem decrescente + curva acumulada. Mostra “os poucos vitais”.",
+    "<b>Ishikawa</b> (espinha de peixe) organiza causas em categorias como os 6M.",
+    "Combinação comum: Ishikawa para levantar causas, Pareto para priorizar."]]}
+];
+
+/* ============ ESTADO ============ */
+const LETTERS = ["A","B","C","D","E"];
+const app = document.getElementById("app");
+const trail = document.getElementById("trail");
+const live = document.getElementById("live");
+let order = [], idx = 0, results = [], score = 0, streak = 0, current = null, answered = false;
+
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
+const el = (tag, cls, html) => { const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; };
+const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Sorteio equilibrado: mesma quantidade de questões de cada tema */
+function pickQuestions(n){
+  const per = n / Object.keys(TOPICS).length;
+  let pool = [];
+  Object.keys(TOPICS).forEach(t=>{
+    const ids = QUESTIONS.map((q,i)=>q.t===t?i:-1).filter(i=>i>-1);
+    pool = pool.concat(shuffle(ids).slice(0,per));
+  });
+  return shuffle(pool);
+}
+
+/* ============ TELA INICIAL ============ */
+function renderStart(){
+  document.getElementById("scoreBox").hidden = true;
+  trail.hidden = true;
+  app.innerHTML = "";
+  const c = el("section","card hero");
+  c.innerHTML = `
+    <div class="emoji">🧩</div>
+    <h1>Bora revisar para a prova?</h1>
+    <p>Casos práticos de Engenharia de Requisitos com cinco alternativas cada. Leia o cenário, escolha uma resposta e veja na hora se acertou.</p>
+    <ul class="rules">
+      <li>✅ Acertou: ganha uma dica sobre o tema</li>
+      <li>❌ Errou: veja sua resposta ao lado da correta</li>
+      <li>⌨️ Teclas A a E também funcionam</li>
+    </ul>
+    <div class="pick-title">Quantas questões você quer fazer?</div>`;
+  const grid = el("div","sizes");
+  [[10,"Aquecimento","~15 min"],[20,"Revisão","~30 min"],[30,"Treino forte","~45 min"],[40,"Completão","~1 hora"]].forEach(([n,l,t])=>{
+    const b = el("button","size",`<span class="n">${n}</span><span class="l">${l}</span><span class="t">${t}</span>`);
+    b.setAttribute("aria-label",`${n} questões, ${l}, ${t}`);
+    b.onclick = () => start(pickQuestions(n));
+    grid.appendChild(b);
+  });
+  c.appendChild(grid);
+  c.appendChild(el("p","note","As questões são sorteadas com a mesma quantidade para cada um dos 5 temas da prova."));
+  app.appendChild(c);
+  grid.firstChild.focus();
+}
+
+function start(list){
+  order = list; idx = 0; results = []; score = 0; streak = 0;
+  document.getElementById("scoreBox").hidden = false;
+  trail.hidden = false;
+  updateScore();
+  renderQuestion();
+}
+
+function renderTrail(){
+  trail.innerHTML = "";
+  order.forEach((qi,i)=>{
+    const s = el("span","seg");
+    const r = results[i];
+    if(r) s.classList.add(r.ok?"ok":"bad");
+    else if(i===idx) s.classList.add("now");
+    trail.appendChild(s);
+  });
+  trail.setAttribute("aria-label",`Progresso: questão ${Math.min(idx+1,order.length)} de ${order.length}`);
+}
+
+function updateScore(){
+  document.getElementById("scoreNum").textContent = score;
+  document.getElementById("streakNum").textContent = streak;
+}
+
+/* ============ QUESTÃO ============ */
+function renderQuestion(){
+  answered = false;
+  const q = QUESTIONS[order[idx]];
+  current = { q, map: shuffle([0,1,2,3,4]) };
+  renderTrail();
+  app.innerHTML = "";
+  const c = el("section","card");
+  const meta = el("div","meta");
+  meta.appendChild(el("span","topic", TOPICS[q.t].name));
+  meta.appendChild(el("span","count", `Questão ${idx+1} de ${order.length}`));
+  c.appendChild(meta);
+  const sc = el("div","scenario");
+  sc.appendChild(el("b",null,"📋 Cenário"));
+  sc.appendChild(document.createTextNode(q.s));
+  c.appendChild(sc);
+  const h = el("h2","q"); h.textContent = q.q; h.id="qtitle"; c.appendChild(h);
+
+  const ul = el("ul","opts"); ul.setAttribute("aria-labelledby","qtitle");
+  current.map.forEach((orig,pos)=>{
+    const li = el("li");
+    const b = el("button","opt",`<span class="letter">${LETTERS[pos]}</span><span class="txt"></span>`);
+    b.querySelector(".txt").textContent = q.o[orig];
+    b.onclick = () => choose(pos);
+    li.appendChild(b); ul.appendChild(li);
+  });
+  c.appendChild(ul);
+  c.appendChild(el("div","fb"));
+
+  const act = el("div","actions");
+  const left = el("div");
+  left.appendChild(el("span","hint","Clique numa alternativa ou tecle de A a E."));
+  act.appendChild(left);
+  const next = el("button","btn", idx===order.length-1 ? "Ver meu resultado" : "Próxima questão");
+  next.hidden = true; next.id="nextBtn"; next.onclick = goNext;
+  act.appendChild(next);
+  c.appendChild(act);
+
+  const quit = el("button","link","Encerrar e ver resultado parcial");
+  quit.onclick = () => { if(results.length) renderEnd(); else renderStart(); };
+  quit.style.marginTop = ".75rem";
+  c.appendChild(quit);
+
+  app.appendChild(c);
+  window.scrollTo({top:0, behavior: reduced() ? "auto":"smooth"});
+}
+
+function choose(pos){
+  if(answered) return;
+  answered = true;
+  const { q, map } = current;
+  const correctPos = map.indexOf(q.c);
+  const ok = pos === correctPos;
+  [...app.querySelectorAll(".opt")].forEach((b,i)=>{
+    b.disabled = true;
+    if(i===correctPos) b.classList.add("right", ...(ok?["pop"]:[]));
+    else if(i===pos) b.classList.add("wrong","shake");
+    else b.classList.add("dim");
+  });
+  results[idx] = { qi: order[idx], ok, chosen: map[pos] };
+  if(ok){ score++; streak++; confetti(); } else streak = 0;
+  updateScore(); renderTrail();
+
+  const fb = app.querySelector(".fb");
+  fb.className = "fb show " + (ok?"ok":"bad");
+  const tipHtml = `<div class="tip"><b class="h">💡 ${q.tip[0]}</b><ul>${q.tip[1].map(t=>`<li>${t}</li>`).join("")}</ul></div>`;
+  if(ok){
+    const cheers = ["Acertou! 🎉","Mandou bem! 🎯","Isso aí! 🚀","Perfeito! 🌟","Na mosca! 🏹"];
+    const msg = streak>=3 ? `Acertou! ${streak} seguidas 🔥` : cheers[Math.floor(Math.random()*cheers.length)];
+    fb.innerHTML = `<h3>${msg}</h3>${tipHtml}`;
+    live.textContent = "Resposta correta.";
+  } else {
+    fb.innerHTML = `<h3>Não foi dessa vez 🤔</h3>
+      <div class="compare">
+        <div class="w"><strong>Você marcou ${LETTERS[pos]}</strong><span class="t1"></span></div>
+        <div class="r"><strong>A correta é ${LETTERS[correctPos]}</strong><span class="t2"></span></div>
+      </div>${tipHtml}`;
+    fb.querySelector(".t1").textContent = q.o[map[pos]];
+    fb.querySelector(".t2").textContent = q.o[q.c];
+    live.textContent = `Resposta errada. A correta é a alternativa ${LETTERS[correctPos]}.`;
+  }
+  app.querySelector(".hint").textContent = "Tecle Enter para continuar.";
+  const nb = document.getElementById("nextBtn"); nb.hidden = false; nb.focus({preventScroll:true});
+}
+
+function goNext(){ if(idx < order.length-1){ idx++; renderQuestion(); } else renderEnd(); }
+
+/* ============ RESULTADO ============ */
+function renderEnd(){
+  const done = results.filter(Boolean);
+  const total = done.length;
+  const pct = total ? score/total : 0;
+  const stars = pct===1?5: pct>=.8?4: pct>=.6?3: pct>=.4?2: pct>0?1:0;
+  const msg = pct===1 ? "Gabaritou! Você está pronto para a prova."
+    : pct>=.7 ? "Muito bom! Dê uma olhada nos pontos de melhoria abaixo e está tudo certo."
+    : pct>=.4 ? "Bom começo. Veja abaixo os temas que precisam de mais atenção."
+    : "Hora de revisar com calma. Siga as sugestões abaixo e tente de novo.";
+  order = done.map(r=>r.qi);
+  idx = order.length; renderTrail();
+  document.getElementById("scoreBox").hidden = false;
+  app.innerHTML = "";
+  const c = el("section","card");
+
+  const head = el("div","result-head");
+  head.innerHTML = `<div class="hero" style="padding:.5rem 0 0"><div class="emoji">${pct===1?"🏆":pct>=.7?"🎉":pct>=.4?"💪":"📚"}</div></div>
+    <div class="big-score">${score}<span>/${total}</span></div>
+    <div class="stars" aria-label="${stars} de 5 estrelas">${"⭐".repeat(stars)}${"☆".repeat(5-stars)}</div>
+    <p style="margin:0 auto; max-width:34rem; color:var(--ink-soft)">${msg}</p>`;
+  c.appendChild(head);
+
+  // Desempenho por tema
+  const stats = {};
+  done.forEach(r=>{ const t=QUESTIONS[r.qi].t; stats[t]=stats[t]||{ok:0,n:0}; stats[t].n++; if(r.ok) stats[t].ok++; });
+  const sec1 = el("div","sec"); sec1.appendChild(el("h3",null,"📊 Seu desempenho por tema"));
+  const bars = el("div","bars");
+  Object.keys(TOPICS).filter(t=>stats[t]).forEach(t=>{
+    const {ok,n} = stats[t], p = ok/n;
+    const row = el("div","bar-row");
+    row.innerHTML = `<div class="lbl"><b>${TOPICS[t].name}</b><span>${ok} de ${n} (${Math.round(p*100)}%)</span></div>
+      <div class="track"><div class="fill ${p>=.7?"hi":p>=.5?"md":"lo"}" data-w="${p*100}"></div></div>`;
+    bars.appendChild(row);
+  });
+  sec1.appendChild(bars); c.appendChild(sec1);
+
+  // O que melhorar
+  const sec2 = el("div","sec"); sec2.appendChild(el("h3",null,"🎯 O que você pode melhorar"));
+  const imp = el("div","improve");
+  const weak = Object.keys(TOPICS).filter(t=>stats[t] && stats[t].ok/stats[t].n < .7)
+    .sort((a,b)=>stats[a].ok/stats[a].n - stats[b].ok/stats[b].n);
+  if(weak.length){
+    weak.forEach(t=>{
+      const box = el("div","imp");
+      const {ok,n} = stats[t];
+      box.innerHTML = `<b class="h">${TOPICS[t].name}: ${ok} de ${n}</b><ul>${TOPICS[t].study.map(s=>`<li>${s}</li>`).join("")}</ul>`;
+      imp.appendChild(box);
+    });
+    const strong = Object.keys(TOPICS).filter(t=>stats[t] && stats[t].ok/stats[t].n >= .7);
+    if(strong.length){
+      const g = el("div","imp good");
+      g.innerHTML = `<b class="h">Seus pontos fortes</b>${strong.map(t=>TOPICS[t].name).join(", ")}. Continue assim!`;
+      imp.appendChild(g);
+    }
+  } else {
+    const g = el("div","imp good");
+    g.innerHTML = `<b class="h">Você foi bem em todos os temas 👏</b>Para fechar a preparação, tente o modo com mais questões ou refaça as que errou para fixar os detalhes.`;
+    imp.appendChild(g);
+  }
+  sec2.appendChild(imp); c.appendChild(sec2);
+
+  // Listas de acertos e erros
+  const wrongs = done.filter(r=>!r.ok), rights = done.filter(r=>r.ok);
+  const mkList = (title, list, isOk) => {
+    const s = el("div","sec"); s.appendChild(el("h3",null,title));
+    if(!list.length){ s.appendChild(el("p","empty", isOk ? "Nenhum acerto desta vez. Leia as dicas e tente de novo!" : "Nenhum erro. Parabéns!")); return s; }
+    if(!isOk) s.appendChild(el("p","empty","Toque em uma questão para ver o que você marcou e a resposta certa."));
+    const l = el("div","qlist");
+    list.forEach(r=>{
+      const q = QUESTIONS[r.qi], n = done.indexOf(r)+1;
+      const d = el("details","qitem");
+      const sm = el("summary",null,`<span class="dot ${isOk?"ok":"bad"}">${isOk?"✓":"✗"}</span><span class="qt"><small></small><span></span></span>`);
+      sm.querySelector("small").textContent = `Questão ${n}: ${TOPICS[q.t].name}`;
+      sm.querySelector(".qt > span").textContent = q.q;
+      d.appendChild(sm);
+      const body = el("div","body");
+      if(!isOk){
+        body.innerHTML = `<div class="w"><strong>Você marcou</strong><span class="a"></span></div><div class="r"><strong>Resposta certa</strong><span class="b"></span></div>`;
+        body.querySelector(".a").textContent = q.o[r.chosen];
+      } else {
+        body.innerHTML = `<div class="r"><strong>Sua resposta</strong><span class="b"></span></div>`;
+      }
+      body.querySelector(".b").textContent = q.o[q.c];
+      d.appendChild(body);
+      l.appendChild(d);
+    });
+    s.appendChild(l); return s;
+  };
+  c.appendChild(mkList(`❌ Questões que você errou (${wrongs.length})`, wrongs, false));
+  c.appendChild(mkList(`✅ Questões que você acertou (${rights.length})`, rights, true));
+
+  // Ações
+  const acts = el("div","end-actions");
+  if(wrongs.length){
+    const b1 = el("button","btn",`Refazer as ${wrongs.length} que errei`);
+    b1.onclick = ()=> start(shuffle(wrongs.map(r=>r.qi)));
+    acts.appendChild(b1);
+  }
+  const b2 = el("button", wrongs.length ? "btn ghost":"btn","Nova revisão");
+  b2.onclick = renderStart;
+  acts.appendChild(b2);
+  c.appendChild(acts);
+
+  app.appendChild(c);
+  window.scrollTo({top:0, behavior: reduced() ? "auto":"smooth"});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>app.querySelectorAll(".fill").forEach(f=>f.style.width=f.dataset.w+"%")));
+  if(pct>=.7 && total) confetti(true);
+  acts.firstChild.focus({preventScroll:true});
+}
+
+document.addEventListener("keydown", e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  if(!app.querySelector(".opt")) return;
+  const i = LETTERS.indexOf(e.key.toUpperCase());
+  if(!answered && i>-1){ e.preventDefault(); choose(i); }
+  else if(answered && e.key==="Enter" && document.activeElement?.id!=="nextBtn"){ e.preventDefault(); goNext(); }
+});
+
+/* ============ CONFETE ============ */
+const cv = document.getElementById("confetti"), cx = cv.getContext("2d");
+let parts = [], raf = null;
+function resize(){ cv.width = innerWidth*devicePixelRatio; cv.height = innerHeight*devicePixelRatio; cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+addEventListener("resize", resize); resize();
+function confetti(big){
+  if(reduced()) return;
+  const colors = ["#5B4BDB","#FFC940","#128A63","#FF7A80","#4FB3FF"];
+  const n = big?160:70;
+  for(let i=0;i<n;i++) parts.push({x:innerWidth/2+(Math.random()-.5)*200, y:innerHeight*.45, vx:(Math.random()-.5)*12, vy:-Math.random()*12-4,
+      s:Math.random()*7+4, r:Math.random()*6, vr:(Math.random()-.5)*.3, c:colors[i%colors.length], life:0});
+  if(!raf) tick();
+}
+function tick(){
+  cx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p=>{ p.vy+=.35; p.vx*=.99; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.life++;
+    cx.save(); cx.translate(p.x,p.y); cx.rotate(p.r); cx.fillStyle=p.c; cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); cx.restore(); });
+  parts = parts.filter(p=>p.y<innerHeight+30 && p.life<220);
+  raf = parts.length ? requestAnimationFrame(tick) : (cx.clearRect(0,0,innerWidth,innerHeight), null);
+}
+
+renderStart();
+</script>
+</body>
+</html>
