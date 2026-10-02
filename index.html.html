@@ -213,10 +213,11 @@ const TOPICS = {
            "Relembre as ferramentas da qualidade: Ishikawa, Pareto e 5 Porquês, e em que etapa cada uma entra."]}
 };
 
-/* ============ QUESTÕES (8 por tema) ============ */
+/* ============ QUESTÕES ============
+   Campo p (prioridade no sorteio): 1 = sempre entra; 2 = entra assim que houver espaço; sem p = complemento. */
 const QUESTIONS = [
 /* ---------- PROCESSO HOLÍSTICO ---------- */
-{ t:"processo", exam:true,
+{ t:"processo", p:1,
   s:"Em um projeto de sistema de folha de pagamento, a equipe considerou o documento de requisitos “congelado” logo após a assinatura inicial do cliente. Seis meses depois, uma mudança na legislação trabalhista tornou vários requisitos obsoletos, mas a equipe recusou-se a atualizá-los, alegando que “requisitos já aprovados não podem ser alterados”. O sistema foi entregue em desacordo com a legislação vigente.",
   q:"Sob a perspectiva do processo holístico de Engenharia de Requisitos, qual foi o erro conceitual da equipe?",
   o:["Nenhum erro: requisitos aprovados formalmente não devem mesmo ser alterados, independentemente do contexto.",
@@ -228,7 +229,7 @@ const QUESTIONS = [
     "A ER não acaba na assinatura: a <b>gestão de requisitos</b> acompanha o projeto do início ao fim.",
     "Aprovar um documento cria uma <b>baseline</b> (versão de referência), não um “congelamento” eterno.",
     "Mudança se trata com <b>controle de mudanças</b>: solicitação, análise de impacto e aprovação."]]},
-{ t:"processo", exam:true,
+{ t:"processo", p:1,
   s:"Uma equipe conduziu a elicitação de requisitos de um novo sistema interno conversando apenas com o diretor que patrocinou o projeto. Ao lançar o sistema, os funcionários que usariam a ferramenta no dia a dia rejeitaram a solução, pois ela não refletia a forma real como o trabalho era executado.",
   q:"Essa situação exemplifica uma falha em qual atividade do processo holístico de ER?",
   o:["Especificação formal dos requisitos não funcionais.",
@@ -240,6 +241,18 @@ const QUESTIONS = [
     "Stakeholder é qualquer pessoa ou grupo <b>afetado</b> pelo sistema ou que o <b>influencia</b>.",
     "Quem paga nem sempre é quem usa. O usuário final conhece o trabalho <b>real</b>.",
     "Ferramenta útil: matriz <b>poder × interesse</b> para decidir como envolver cada grupo."]]},
+{ t:"processo", p:2,
+  s:"Um novo marketplace online vai conectar pequenos produtores rurais diretamente a consumidores finais. Estão envolvidos: (1) produtores rurais, muitos com pouca familiaridade com tecnologia; (2) a equipe interna de logística, que define regras de frete e prazos; e (3) consumidores que usarão um aplicativo móvel. A equipe de análise trabalha na capital e tem fácil acesso à logística e a consumidores urbanos.",
+  q:"Qual risco de análise de stakeholders a equipe deveria evitar e por que ele comprometeria o processo de ER?",
+  o:["Ouvir só quem é mais fácil de alcançar (logística e consumidores) e deixar de fora os produtores rurais. Os requisitos não refletiriam a realidade deles, o que levaria a baixa adesão e retrabalho em todas as etapas seguintes.",
+     "Ouvir os produtores rurais, pois isso atrasaria o projeto; a equipe de logística pode falar em nome deles.",
+     "Envolver stakeholders demais; o correto é ouvir apenas o patrocinador do projeto.",
+     "Escolher o framework errado para o aplicativo móvel, pois esse é o principal risco de stakeholders.",
+     "Não há risco relevante, já que produtores e consumidores têm exatamente as mesmas necessidades."],
+  c:0, tip:["O stakeholder “difícil” também conta",[
+    "O risco clássico é ouvir só quem está <b>perto</b> ou <b>fala mais alto</b> e esquecer grupos menos visíveis.",
+    "Um grupo esquecido gera requisitos <b>incompletos</b>, que contaminam especificação, validação e entrega.",
+    "Ninguém fala bem <b>em nome</b> de outro grupo: cada perfil precisa ser ouvido diretamente."]]},
 { t:"processo",
   s:"A equipe escreveu a especificação completa de um aplicativo de agendamento e passou direto para o desenvolvimento, sem que o cliente revisasse o documento. Na primeira demonstração, o cliente disse que várias regras tinham sido entendidas de forma errada.",
   q:"Qual atividade da ER foi negligenciada?",
@@ -314,7 +327,7 @@ const QUESTIONS = [
     "Macete: vaLIDação olha para o cLIente; verificação olha para o documento."]]},
 
 /* ---------- ELICITAÇÃO E PRIORIZAÇÃO ---------- */
-{ t:"elicitacao", exam:true,
+{ t:"elicitacao", p:1,
   s:"Os departamentos de Vendas e Logística têm visões conflitantes sobre o novo sistema de pedidos. A equipe reuniu representantes de ambos em uma única sessão presencial, intensiva e estruturada, conduzida por um facilitador neutro, para chegar a um consenso em poucas horas.",
   q:"Essa técnica de elicitação é conhecida como:",
   o:["Questionário assíncrono.",
@@ -326,7 +339,7 @@ const QUESTIONS = [
     "<b>Todos juntos</b>, <b>facilitador neutro</b>, sessão <b>estruturada</b> e foco em <b>consenso</b>.",
     "Ideal quando há <b>conflito entre áreas</b> e pouco tempo.",
     "Questionário é à distância; etnografia é observar; protótipo é mostrar algo para reagir."]]},
-{ t:"elicitacao", exam:true,
+{ t:"elicitacao", p:1,
   s:"Uma empresa precisa adequar seu sistema à LGPD até uma data-limite improrrogável. A lista inclui itens obrigatórios por lei, itens importantes mas negociáveis, itens desejáveis e itens que definitivamente não entrarão nesta entrega.",
   q:"Qual técnica de priorização é mais adequada para essas quatro categorias, dado o prazo rígido?",
   o:["Método MoSCoW (Must have, Should have, Could have, Won’t have).",
@@ -338,6 +351,18 @@ const QUESTIONS = [
     "<b>Must</b>: obrigatório. <b>Should</b>: importante, negociável.",
     "<b>Could</b>: desejável, se sobrar tempo. <b>Won’t</b>: fora <i>desta</i> entrega.",
     "Quatro categorias + prazo fixo = MoSCoW."]]},
+{ t:"elicitacao", p:2,
+  s:"No marketplace que liga pequenos produtores rurais a consumidores, a analista precisa levantar requisitos com dois grupos bem diferentes: produtores rurais, muitos com pouca familiaridade com tecnologia e internet instável, e consumidores urbanos, numerosos, espalhados e acostumados a usar aplicativos no celular.",
+  q:"Qual combinação de técnicas de elicitação é mais adequada ao perfil de cada grupo?",
+  o:["Produtores: questionário online longo enviado por e-mail. Consumidores: observação etnográfica dentro das casas deles.",
+     "Um único questionário online para todos, para garantir padronização das respostas.",
+     "Produtores: entrevistas presenciais e observação na propriedade, com linguagem simples. Consumidores: questionário online em escala e protótipos de tela do aplicativo.",
+     "Produtores: análise de documentos legados do sistema atual. Consumidores: nenhuma técnica, pois apps de compra são todos iguais.",
+     "Produtores: workshop JAD virtual em ferramenta colaborativa avançada. Consumidores: entrevista individual com cada um."],
+  c:2, tip:["A técnica segue o perfil",[
+    "Pouca familiaridade com tecnologia: <b>presencial</b>, <b>linguagem simples</b>, <b>observação</b> do trabalho real.",
+    "Muitas pessoas espalhadas e digitais: <b>questionário online</b> para escala e <b>protótipos</b> para reagir às telas.",
+    "Para a equipe de logística, entrevistas e <b>análise de documentos</b> das regras de frete também funcionam bem."]]},
 { t:"elicitacao",
   s:"Os operadores de uma central de atendimento não conseguem explicar direito como fazem seu trabalho: muitos passos são automáticos e “vêm com a prática”. O analista decidiu passar três dias ao lado deles, acompanhando a rotina real.",
   q:"Qual técnica de elicitação o analista está usando?",
@@ -412,7 +437,7 @@ const QUESTIONS = [
     "Planning Poker serve para <b>estimar esforço</b>, não para priorizar valor."]]},
 
 /* ---------- ESPECIFICAÇÃO E DOCUMENTAÇÃO ---------- */
-{ t:"especificacao", exam:true,
+{ t:"especificacao", p:1,
   s:"Uma equipe ágil escreve: “Como cliente, eu quero receber um e-mail de confirmação após finalizar uma compra, para ter certeza de que meu pedido foi registrado.” E complementa: “Dado que o cliente finalizou a compra, Quando o pagamento for aprovado, Então um e-mail de confirmação deve ser enviado em até 1 minuto.”",
   q:"Essas duas formas de documentação correspondem, respectivamente, a:",
   o:["Diagrama de Classes e Diagrama de Casos de Uso.",
@@ -424,7 +449,7 @@ const QUESTIONS = [
     "User Story: <b>Como</b> [papel], <b>eu quero</b> [ação], <b>para</b> [benefício].",
     "Gherkin: <b>Dado</b> (contexto), <b>Quando</b> (evento), <b>Então</b> (resultado).",
     "Boa história segue o <b>INVEST</b>: independente, negociável, valiosa, estimável, pequena e testável."]]},
-{ t:"especificacao", exam:true,
+{ t:"especificacao", p:1,
   s:"Durante a manutenção de um sistema, uma regra de negócio precisou ser alterada. Antes de implementar, a equipe consultou um documento que relaciona cada requisito às telas, aos casos de teste e aos módulos de código, identificando rapidamente tudo o que seria impactado.",
   q:"Esse documento/prática é conhecido como:",
   o:["Matriz de Rastreabilidade de Requisitos.",
@@ -436,7 +461,7 @@ const QUESTIONS = [
     "A matriz liga cada requisito à sua <b>origem</b> e a tudo que ele <b>gera</b>: telas, código e testes.",
     "Para trás: de onde veio. Para frente: onde foi implementado.",
     "Principal uso: <b>análise de impacto</b> antes de uma mudança."]]},
-{ t:"especificacao", exam:true,
+{ t:"especificacao", p:2,
   s:"Em um marketplace que conecta produtores rurais a consumidores (que usam um app móvel), a disponibilidade é um requisito não funcional importante. O cliente escreveu: “o sistema deve estar sempre disponível”.",
   q:"Qual reescrita transforma esse requisito vago em um requisito preciso e verificável?",
   o:["O sistema deve ficar disponível na maior parte do tempo, com o mínimo possível de interrupções.",
@@ -510,7 +535,7 @@ const QUESTIONS = [
     "<b>Sequência</b>: a troca de mensagens entre objetos, em ordem temporal."]]},
 
 /* ---------- QUALIDADE ---------- */
-{ t:"qualidade", exam:true,
+{ t:"qualidade", p:1,
   s:"Uma fábrica garante que 100% dos seus eletrodomésticos atendem rigorosamente às especificações técnicas (medidas, voltagem, materiais). Ainda assim, os consumidores preferem marcas concorrentes, percebidas como “mais confiáveis”, mesmo com especificações semelhantes.",
   q:"Essa situação ilustra a diferença entre quais duas dimensões da qualidade, segundo Garvin?",
   o:["Durabilidade (vida útil) e Atendimento (suporte técnico).",
@@ -522,7 +547,7 @@ const QUESTIONS = [
     "Desempenho, Características, Confiabilidade, <b>Conformidade</b>, Durabilidade, Atendimento, Estética e <b>Qualidade Percebida</b>.",
     "Conformidade é <b>objetiva</b>; qualidade percebida é <b>subjetiva</b> (marca, reputação).",
     "“Mais confiáveis” entre aspas fala de <i>percepção</i>, não de taxa de falhas medida."]]},
-{ t:"qualidade", exam:true,
+{ t:"qualidade", p:2,
   s:"Uma empresa de software alcançou o nível F do MPS.BR, com processos bem documentados e seguidos rigorosamente. Mesmo assim, os clientes dizem que o software “funciona conforme contratado”, mas “parece antiquado” e é “difícil de usar” comparado aos concorrentes.",
   q:"Qual explicação, com base nas dimensões de Garvin, é a mais adequada?",
   o:["Isso é impossível: o nível F do MPS.BR garante automaticamente a satisfação do cliente.",
@@ -533,7 +558,7 @@ const QUESTIONS = [
   c:1, tip:["Processo maduro ≠ cliente encantado",[
     "Maturidade (MPS.BR, CMMI) mede a <b>capacidade do processo</b>, não o gosto do cliente.",
     "“Funciona conforme contratado” = <b>Conformidade</b>. “Parece antiquado” = <b>Estética</b>.",
-    "No DMAIC, comece pelo <b>Define</b>, ouvindo a voz do cliente."]]},
+    "Qualidade é multidimensional: ir bem em uma dimensão não garante as outras."]]},
 { t:"qualidade",
   s:"Uma marca de notebooks divulga que, em testes com 10 mil aparelhos, apenas 0,5% apresentaram algum defeito durante o primeiro ano de uso.",
   q:"Essa informação está ligada principalmente a qual dimensão de Garvin?",
@@ -608,7 +633,7 @@ const QUESTIONS = [
     "<b>Usuário</b>: adequação ao uso (Juran). <b>Valor</b>: qualidade a um preço aceitável."]]},
 
 /* ---------- MATURIDADE E MELHORIA ---------- */
-{ t:"maturidade", exam:true,
+{ t:"maturidade", p:1,
   s:"Uma equipe de melhoria contínua mediu com precisão a taxa de defeitos de uma linha de produção, mas, em vez de investigar as causas-raiz, partiu direto para uma solução que “pareceu óbvia”. A solução não resolveu o problema, pois a causa real era outra.",
   q:"Qual etapa do ciclo DMAIC (Six Sigma) foi indevidamente pulada?",
   o:["Define (Definir).",
@@ -620,6 +645,18 @@ const QUESTIONS = [
     "<b>D</b>efinir, <b>M</b>edir, <b>A</b>nalisar, <b>I</b>mplementar (Improve), <b>C</b>ontrolar.",
     "A equipe foi de <b>M</b> direto para <b>I</b>, pulando o <b>A</b>.",
     "Ferramentas do Analisar: Ishikawa, 5 Porquês e Pareto."]]},
+{ t:"maturidade", p:2,
+  s:"Uma empresa de software com nível F do MPS.BR segue seus processos à risca, mas a satisfação dos clientes é baixa: eles dizem que o software “funciona conforme contratado”, porém “parece antiquado” e é “difícil de usar”. A diretoria quer aplicar o DMAIC para investigar esse problema de percepção de qualidade.",
+  q:"Por qual etapa do DMAIC a empresa deve começar e que tipo de informação deve levantar nela?",
+  o:["Control, auditando se os processos do nível F continuam sendo seguidos.",
+     "Improve, redesenhando imediatamente toda a interface, já que o problema parece óbvio.",
+     "Define, ouvindo a voz do cliente (pesquisas de satisfação, entrevistas, reclamações e comparação com concorrentes) para definir com clareza o problema, o escopo e o que o cliente considera qualidade.",
+     "Measure, contando linhas de código e número de bugs, pois só dados técnicos são confiáveis.",
+     "Analyze, buscando causas-raiz antes mesmo de saber exatamente qual é o problema percebido pelo cliente."],
+  c:2, tip:["Tudo começa no Define",[
+    "O <b>Define</b> delimita o problema, o escopo e as metas a partir da <b>voz do cliente (VOC)</b>.",
+    "Num problema de <b>percepção</b>, os dados certos vêm do cliente: pesquisas, entrevistas, NPS, reclamações e benchmarking.",
+    "Pular para o Improve repete o erro de agir sem entender a causa."]]},
 { t:"maturidade",
   s:"Em uma software house, cada projeto é tocado de um jeito. As entregas só dão certo quando dois programadores muito experientes “viram a noite”. Quando eles saem de férias, prazos e qualidade despencam.",
   q:"Segundo o CMMI, essa organização está em qual nível de maturidade?",
@@ -643,7 +680,7 @@ const QUESTIONS = [
   c:3, tip:["MPS.BR de trás para frente",[
     "Sete níveis: <b>G</b> Parcialmente gerenciado, <b>F</b> Gerenciado, <b>E</b> Parcialmente definido, <b>D</b> Largamente definido, <b>C</b> Definido, <b>B</b> Gerenciado quantitativamente, <b>A</b> Em otimização.",
     "Começa no <b>G</b> e sobe até o <b>A</b>.",
-    "O nível F, da questão sobre satisfação, é o segundo degrau."]]},
+    "O nível F é o segundo degrau."]]},
 { t:"maturidade",
   s:"O dono de uma empresa com 15 desenvolvedores está em dúvida entre adotar o CMMI ou o MPS.BR para melhorar seus processos.",
   q:"Qual é uma vantagem do MPS.BR para esse tipo de empresa?",
@@ -717,13 +754,17 @@ const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){const j=Math
 const el = (tag, cls, html) => { const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; };
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* Sorteio equilibrado: mesma quantidade de questões de cada tema */
+/* Sorteio equilibrado: mesma quantidade por tema.
+   Dentro de cada tema, entram primeiro as de prioridade 1, depois as de prioridade 2
+   e só então as demais (em ordem aleatória). No fim tudo é embaralhado. */
 function pickQuestions(n){
   const per = n / Object.keys(TOPICS).length;
+  const rank = i => QUESTIONS[i].p || 9;
   let pool = [];
   Object.keys(TOPICS).forEach(t=>{
     const ids = QUESTIONS.map((q,i)=>q.t===t?i:-1).filter(i=>i>-1);
-    pool = pool.concat(shuffle(ids).slice(0,per));
+    const ranked = shuffle(ids).sort((a,b)=>rank(a)-rank(b));
+    pool = pool.concat(ranked.slice(0,per));
   });
   return shuffle(pool);
 }
@@ -892,7 +933,6 @@ function renderEnd(){
     <p style="margin:0 auto; max-width:34rem; color:var(--ink-soft)">${msg}</p>`;
   c.appendChild(head);
 
-  // Desempenho por tema
   const stats = {};
   done.forEach(r=>{ const t=QUESTIONS[r.qi].t; stats[t]=stats[t]||{ok:0,n:0}; stats[t].n++; if(r.ok) stats[t].ok++; });
   const sec1 = el("div","sec"); sec1.appendChild(el("h3",null,"📊 Seu desempenho por tema"));
@@ -906,7 +946,6 @@ function renderEnd(){
   });
   sec1.appendChild(bars); c.appendChild(sec1);
 
-  // O que melhorar
   const sec2 = el("div","sec"); sec2.appendChild(el("h3",null,"🎯 O que você pode melhorar"));
   const imp = el("div","improve");
   const weak = Object.keys(TOPICS).filter(t=>stats[t] && stats[t].ok/stats[t].n < .7)
@@ -931,7 +970,6 @@ function renderEnd(){
   }
   sec2.appendChild(imp); c.appendChild(sec2);
 
-  // Listas de acertos e erros
   const wrongs = done.filter(r=>!r.ok), rights = done.filter(r=>r.ok);
   const mkList = (title, list, isOk) => {
     const s = el("div","sec"); s.appendChild(el("h3",null,title));
@@ -961,7 +999,6 @@ function renderEnd(){
   c.appendChild(mkList(`❌ Questões que você errou (${wrongs.length})`, wrongs, false));
   c.appendChild(mkList(`✅ Questões que você acertou (${rights.length})`, rights, true));
 
-  // Ações
   const acts = el("div","end-actions");
   if(wrongs.length){
     const b1 = el("button","btn",`Refazer as ${wrongs.length} que errei`);
